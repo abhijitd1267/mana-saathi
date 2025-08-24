@@ -7,11 +7,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getCurrentUser, mockJournalEntries, mockAssessments, mockPatients, mockRiskFlags } from '@/lib/mock-data';
 import { EMOTIONS } from '@/lib/types';
 import { useNavigate } from 'react-router-dom';
-
 export default function Dashboard() {
   const currentUser = getCurrentUser();
   const navigate = useNavigate();
-
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return 'Good morning';
@@ -23,18 +21,12 @@ export default function Dashboard() {
   if (currentUser.role === 'patient') {
     const recentEntries = mockJournalEntries.slice(0, 3);
     const latestAssessment = mockAssessments[0];
-    const weeklyEmotions = mockJournalEntries
-      .slice(0, 7)
-      .reduce((acc, entry) => {
-        acc[entry.emotion] = (acc[entry.emotion] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
-
-    const dominantEmotion = Object.entries(weeklyEmotions)
-      .sort(([,a], [,b]) => b - a)[0]?.[0] as keyof typeof EMOTIONS;
-
-    return (
-      <div className="p-6 space-y-6">
+    const weeklyEmotions = mockJournalEntries.slice(0, 7).reduce((acc, entry) => {
+      acc[entry.emotion] = (acc[entry.emotion] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    const dominantEmotion = Object.entries(weeklyEmotions).sort(([, a], [, b]) => b - a)[0]?.[0] as keyof typeof EMOTIONS;
+    return <div className="p-6 space-y-6">
         {/* Welcome Header */}
         <div className="bg-gradient-hero rounded-2xl p-6 text-white">
           <h1 className="text-2xl font-bold mb-2">
@@ -95,8 +87,7 @@ export default function Dashboard() {
               <CardDescription>Your emotional patterns over the last 7 days</CardDescription>
             </CardHeader>
             <CardContent>
-              {dominantEmotion && (
-                <div className="flex items-center gap-4 mb-4 p-3 bg-muted/50 rounded-xl">
+              {dominantEmotion && <div className="flex items-center gap-4 mb-4 p-3 bg-muted/50 rounded-xl">
                   <span className="text-2xl">{EMOTIONS[dominantEmotion].emoji}</span>
                   <div>
                     <p className="font-medium">Most frequent: {EMOTIONS[dominantEmotion].label}</p>
@@ -104,18 +95,15 @@ export default function Dashboard() {
                       {weeklyEmotions[dominantEmotion]} out of {Object.values(weeklyEmotions).reduce((a, b) => a + b, 0)} entries
                     </p>
                   </div>
-                </div>
-              )}
+                </div>}
               <div className="space-y-2">
-                {Object.entries(weeklyEmotions).map(([emotion, count]) => (
-                  <div key={emotion} className="flex items-center justify-between">
+                {Object.entries(weeklyEmotions).map(([emotion, count]) => <div key={emotion} className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span>{EMOTIONS[emotion as keyof typeof EMOTIONS].emoji}</span>
                       <span className="text-sm">{EMOTIONS[emotion as keyof typeof EMOTIONS].label}</span>
                     </div>
                     <Badge variant="outline">{count}</Badge>
-                  </div>
-                ))}
+                  </div>)}
               </div>
             </CardContent>
           </Card>
@@ -127,8 +115,7 @@ export default function Dashboard() {
               <CardDescription>Your latest thoughts and reflections</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {recentEntries.map((entry) => (
-                <div key={entry.id} className="p-3 border border-border rounded-xl">
+              {recentEntries.map(entry => <div key={entry.id} className="p-3 border border-border rounded-xl">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <span>{EMOTIONS[entry.emotion].emoji}</span>
@@ -141,9 +128,8 @@ export default function Dashboard() {
                   <p className="text-sm text-muted-foreground line-clamp-2">
                     {entry.content}
                   </p>
-                </div>
-              ))}
-              <Button variant="outline" className="w-full" onClick={() => navigate('/journal')}>
+                </div>)}
+              <Button variant="outline" onClick={() => navigate('/journal')} className="w-full bg-red-100">
                 View All Entries
               </Button>
             </CardContent>
@@ -151,8 +137,7 @@ export default function Dashboard() {
         </div>
 
         {/* Assessment Progress */}
-        {latestAssessment && (
-          <Card>
+        {latestAssessment && <Card>
             <CardHeader>
               <CardTitle>Latest Assessment Results</CardTitle>
               <CardDescription>Your recent {latestAssessment.type} assessment</CardDescription>
@@ -165,23 +150,19 @@ export default function Dashboard() {
                     Score on {latestAssessment.createdAt.toLocaleDateString()}
                   </p>
                 </div>
-                <Button variant="outline" onClick={() => navigate('/assessments')}>
+                <Button variant="outline" onClick={() => navigate('/assessments')} className="bg-red-100">
                   View Details
                 </Button>
               </div>
             </CardContent>
-          </Card>
-        )}
-      </div>
-    );
+          </Card>}
+      </div>;
   }
 
   // Therapist Dashboard
   if (currentUser.role === 'therapist') {
     const activeRiskFlags = mockRiskFlags.filter(flag => !flag.acknowledgedBy);
-    
-    return (
-      <div className="p-6 space-y-6">
+    return <div className="p-6 space-y-6">
         {/* Welcome Header */}
         <div className="bg-gradient-calm rounded-2xl p-6 text-white">
           <h1 className="text-2xl font-bold mb-2">
@@ -254,10 +235,9 @@ export default function Dashboard() {
               <CardDescription>Patients requiring immediate attention</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {activeRiskFlags.map((flag) => {
-                const patient = mockPatients.find(p => p.id === flag.patientId);
-                return (
-                  <div key={flag.id} className="flex items-center gap-3 p-3 border border-destructive/20 rounded-xl bg-destructive/5">
+              {activeRiskFlags.map(flag => {
+              const patient = mockPatients.find(p => p.id === flag.patientId);
+              return <div key={flag.id} className="flex items-center gap-3 p-3 border border-destructive/20 rounded-xl bg-destructive/5">
                     <Avatar className="w-10 h-10">
                       <AvatarImage src={patient?.avatar} />
                       <AvatarFallback>{patient?.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
@@ -267,9 +247,8 @@ export default function Dashboard() {
                       <p className="text-sm text-muted-foreground">{flag.note}</p>
                     </div>
                     <Badge variant="destructive">{flag.severity}</Badge>
-                  </div>
-                );
-              })}
+                  </div>;
+            })}
               <Button variant="outline" className="w-full" onClick={() => navigate('/risk-flags')}>
                 View All Risk Flags
               </Button>
@@ -282,8 +261,7 @@ export default function Dashboard() {
               <CardDescription>Recent patient activity</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {mockPatients.slice(0, 3).map((patient) => (
-                <div key={patient.id} className="flex items-center gap-3 p-3 border border-border rounded-xl">
+              {mockPatients.slice(0, 3).map(patient => <div key={patient.id} className="flex items-center gap-3 p-3 border border-border rounded-xl">
                   <Avatar className="w-10 h-10">
                     <AvatarImage src={patient.avatar} />
                     <AvatarFallback>{patient.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
@@ -297,17 +275,14 @@ export default function Dashboard() {
                     <span className="text-lg">😌</span>
                     <span className="text-lg">😢</span>
                   </div>
-                </div>
-              ))}
+                </div>)}
               <Button variant="outline" className="w-full">
                 View All Patients
               </Button>
             </CardContent>
           </Card>
         </div>
-      </div>
-    );
+      </div>;
   }
-
   return <div>Dashboard</div>;
 }
